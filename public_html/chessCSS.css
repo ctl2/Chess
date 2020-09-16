@@ -1,0 +1,146 @@
+table {
+    height: 100%;
+}
+
+#container {
+    width: 100%;
+    padding: 20px;
+}
+
+td {
+    text-align: center;
+}
+
+.label {
+    font-size: 1.5em;
+    color: rgb(10,10,10);
+    opacity: 0.6;
+    padding: 15px;
+}
+
+#board {
+    padding-right: 70px;
+}
+
+.square {  
+    border: 1px solid black;
+    animation-duration: 1s;
+}
+.square:hover {background-color: rgba(50, 100, 200, 0.1)}
+
+.destination {
+    animation-name: flashGreen;
+    animation-iteration-count: infinite;
+}
+
+.accepted {
+    animation-name: flashGreen;
+    animation-iteration-count: 1;
+}
+
+.rejected {
+    animation-name: flashRed;
+    animation-iteration-count: 1;
+}
+
+.checked {
+    animation-name: flashRed;
+    animation-iteration-count: infinite;
+}
+
+.mated {
+    background: rgba(100, 0, 0, 0.5);
+}
+
+.black {
+    background: rgba(50, 160, 230, 0.6);
+}
+
+.white {
+    background: aliceblue;
+}
+
+@keyframes flashRed {
+    0% {
+        background: '';
+    }
+    4% {
+        background: rgba(200, 100, 100, 0.4);
+    }
+    100% {
+        background: '';
+    }
+}
+@keyframes flashGreen {
+    0% {
+        background: '';
+    }
+    4% {
+        background: rgba(100, 200, 100, 0.4);
+    }
+    100% {
+        background: '';
+    }
+}
+
+#score {
+    height: min-content;
+}
+
+#scoreboardTop {
+    margin-left: 100px;
+    width: 100px;
+    margin-bottom: 1.5em;
+    padding: 10px;
+    border: 2px double grey;
+    border-radius: 14px;
+}
+
+#notation {
+    font-size: 1.15em;
+    vertical-align: text-top;
+    width: 100%;
+    border: 2px double grey;
+    border-radius: 14px;
+}
+
+#logBooks {
+    height: 1em;
+}
+
+.logBook {
+    height: 1em;
+}
+
+.logPage {
+    align-content: flex-start;
+    padding-left: 1.6em;
+    text-align: left;
+    width: auto;
+    vertical-align: top;
+}
+
+@media (max-width: 800px) {
+    #notation {
+        display: none;
+    }
+}
+
+.button {
+    background-color: rgba(50, 160, 230, 1);
+    color: antiquewhite;
+    padding: 15px 25px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 3em;
+    cursor: pointer;
+    position: fixed;
+    opacity: .8;
+    top: 40%;
+    left: 200px;
+    border-radius: 8px;
+}
+
+.button:hover {
+    opacity: 1;
+}

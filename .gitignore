@@ -1,0 +1,7 @@
+*
+!.gitignore
+!public_html
+!public_html/**
+!LICENSE
+!NOTICE
+!README.md
