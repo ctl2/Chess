@@ -1,6 +1,6 @@
 var pieces = getPieceInfo();
 
-function setScore() {
+function resetScore() {
     var sbTop = document.getElementById("scoreboardTop");
     if (sbTop.innerHTML === '') {
         // The 'whitePoints' and 'blackPoints' duplicate id elements don't create problems because
@@ -75,11 +75,11 @@ function resetNotation() {
     document.getElementById('logBooks').innerHTML = '';
 }
 
-function setup() {
-    setScore();
+function resetBoard() {
     document.getElementById('board').innerHTML = getBoardHTML();
     populateBoard();
-    resetNotation();
 }
 
-setup();
+resetBoard();
+resetNotation();
+resetScore();

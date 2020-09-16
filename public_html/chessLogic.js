@@ -20,8 +20,9 @@ function initialiseVariables() {
     squares = document.getElementsByClassName('square');
 }
 
-function resetBoard() {
-    setup();
+function replay() {
+    resetBoard();
+    resetNotation();
     initialiseVariables();
     redrawBoard();
 }
@@ -300,7 +301,7 @@ class DestinationInputHandler extends InputHandler {
         window.setTimeout(
             function() {
                 document.getElementById('board').innerHTML +=
-                '<button onclick="resetBoard()" class="button">Reset Board</button>';
+                '<button onclick="replay()" class="button">Play Again</button>';
             }
         , 2000);
     }
