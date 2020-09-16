@@ -9,7 +9,7 @@ function setScore() {
         sbTop.innerHTML = scoreHTML;
         document.getElementById("scoreboardSide").innerHTML = scoreHTML;
     }
-    
+
 }
 
 function getPieceInfo() {
@@ -56,13 +56,13 @@ function getBoardHTML() {
     }
     boardHTML += '</table>';
     return boardHTML;
-    
+
 }
 
 function populateBoard() {
     for (var piece in pieces) {
         var coordinates = pieces[piece].startCoordinates;
-        for (n = 0; n < coordinates.length; n++) { 
+        for (n = 0; n < coordinates.length; n++) {
            document.getElementById(coordinates[n]).innerHTML = pieces[piece].code;
            if (piece === 'wKing' || piece === 'bKing' || piece === 'wRook' || piece === 'bRook') {
                document.getElementById(coordinates[n]).classList.add("unmoved");
@@ -75,7 +75,11 @@ function resetNotation() {
     document.getElementById('logBooks').innerHTML = '';
 }
 
-setScore();
-document.getElementById('board').innerHTML = getBoardHTML();
-populateBoard();
-resetNotation();
+function setup() {
+    setScore();
+    document.getElementById('board').innerHTML = getBoardHTML();
+    populateBoard();
+    resetNotation();
+}
+
+setup();

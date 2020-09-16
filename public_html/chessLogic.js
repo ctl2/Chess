@@ -21,9 +21,7 @@ function initialiseVariables() {
 }
 
 function resetBoard() {
-    var script = document.createElement('script');
-    script.src = 'chessSetup.js';
-    document.getElementById('board').appendChild(script);
+    setup();
     initialiseVariables();
     redrawBoard();
 }
@@ -73,11 +71,11 @@ function redrawBoard() {
 }
 
 class InputHandler {
-    
+
     constructor() {
-        
+
     }
-    
+
     reset() {
         var start = move.getStart();
         AestheticsManager.prepAnimation(start);
@@ -88,7 +86,7 @@ class InputHandler {
 }
 
 class StartInputHandler extends InputHandler {
-    
+
     constructor() {
         super();
     }
@@ -133,7 +131,7 @@ class StartInputHandler extends InputHandler {
 }
 
 class DestinationInputHandler extends InputHandler {
-    
+
     constructor() {
         super();
     }
@@ -185,7 +183,7 @@ class DestinationInputHandler extends InputHandler {
     isValid(square) {
         return square.classList.contains('destination');
     }
-    
+
     setCheck(kingSquare, checkers) {
         kingSquare.classList.add('checked');
         move.setCheckers(checkers);
@@ -213,14 +211,14 @@ class DestinationInputHandler extends InputHandler {
         }
         this.recordPosition();
     }
-    
+
     recordPosition() {
         for (var i = 0; i < 8; i++) {
             lastFivePositions[i] = lastFivePositions[i + 1];
         }
         lastFivePositions[8] = document.getElementById('board').innerText;
     }
-    
+
     isWinnable() {
         var foundWhiteMinor = false;
         var foundBlackMinor = false;
@@ -251,7 +249,7 @@ class DestinationInputHandler extends InputHandler {
         }
         return false;
     }
-    
+
     isStalemate() {
         if (! new KingMoveFinder().isChecked()) {
             var occupant;
@@ -287,30 +285,30 @@ class DestinationInputHandler extends InputHandler {
         }
         return false;
     }
-    
+
     isThreeFoldRepetition() {
         return lastFivePositions[8] === lastFivePositions[4] && lastFivePositions[4] === lastFivePositions[0];
     }
-    
+
     endGame() {
         for (var i = 0; i < squares.length; i++) {
             squares[i].removeAttribute('onclick');
         }
     }
-    
+
     makeResetButton() {
-        window.setTimeout( 
+        window.setTimeout(
             function() {
-                document.getElementById('board').innerHTML += 
+                document.getElementById('board').innerHTML +=
                 '<button onclick="resetBoard()" class="button">Reset Board</button>';
             }
         , 2000);
     }
-    
+
 }
 
 class Move {
-    
+
     constructor(square) {
         this.start = square;
         this.destination = undefined;
@@ -318,31 +316,31 @@ class Move {
         this.turnNumber = moveCount;
         this.finder;
     }
-    
+
     setStart(start) {
         this.start = start;
     }
-    
+
     setDestination(destination) {
         this.destination = destination;
     }
-    
+
     setCheckers(checkers) {
         this.checkers = checkers;
     }
-    
+
     getStart() {
         return this.start;
     }
-    
+
     getDestination() {
         return this.destination;
     }
-    
+
     getCheckers() {
         return this.checkers;
     }
-    
+
     retrieveLegalDestinations() {
         var destinations = this.finder.getLegalDestinations();
         if (this.getCheckers().length === 0 || PieceReference.getOccupant(this.start).piece === 'king') {
@@ -350,7 +348,7 @@ class Move {
         }
         return this.getCheckEnders(destinations);
     }
-    
+
     getCheckEnders(destinations) {
         var checkers = this.getCheckers();
         var checkEnders = destinations;
@@ -381,7 +379,7 @@ class Move {
             destination.classList.remove("unmoved");
         }
     }
-    
+
     undoMove(capturedPieceCode, checkers) {
         this.start.innerHTML = this.destination.innerHTML;
         this.destination.innerHTML = capturedPieceCode;
@@ -389,32 +387,32 @@ class Move {
         this.setDestination(undefined);
         this.setCheckers(checkers);
     }
-    
+
 }
 
 class PieceMove extends Move {
-    
+
     constructor(square) {
         super(square);
         this.finder = new PieceMoveFinder(square, this);
     }
-    
+
 }
 
 class KingMove extends Move {
-    
+
     constructor(square) {
         super(square);
         this.finder = new KingMoveFinder(square, this);
     }
-    
+
     makeMove(destination) {
         super.makeMove(destination);
         if (Math.abs(this.finder.getFile(this.start) - this.finder.getFile(this.destination)) === 2) {
             this.castle();
         }
     }
-    
+
     castle() {
         var direction = this.finder.getDirection(this.start, this.destination);
         var rookSquare, rookFile;
@@ -429,11 +427,11 @@ class KingMove extends Move {
         rookSquare.innerHTML = '';
         document.getElementById(rookFile + '' + this.finder.getRank(rookSquare)).innerHTML = rookCode;
     }
-    
+
 }
 
 class PawnMove extends Move {
-    
+
     constructor(square, enPassantSquare) {
         super(square);
         this.enPassantSquare = enPassantSquare;
@@ -448,7 +446,7 @@ class PawnMove extends Move {
             squareRank--;
         }
         this.enPassantSquare = {
-            square:document.getElementById(this.finder.getFile(this.start) + "" + squareRank), 
+            square:document.getElementById(this.finder.getFile(this.start) + "" + squareRank),
             birthday:moveCount
         };
     }
@@ -456,18 +454,18 @@ class PawnMove extends Move {
     forgetEnPassantSquare() {
         this.enPassantSquare = undefined;
     }
-    
+
     isEnPassantSquare(square) {
         if (this.enPassantSquare !== undefined && this.enPassantSquare.birthday === moveCount-1 && this.enPassantSquare.square === square) {
             return true;
         }
         return false;
     }
-    
+
     isQueenSquare() {
-        return this.finder.getRank(this.destination) === 1 || this.finder.getRank(this.destination) === 8; 
+        return this.finder.getRank(this.destination) === 1 || this.finder.getRank(this.destination) === 8;
     }
-    
+
     queenPawn() {
         var queenCodes = {
             w:'\u2655',
@@ -475,7 +473,7 @@ class PawnMove extends Move {
         };
         this.destination.innerHTML = queenCodes[PieceReference.getOccupant(this.destination).colour];
     }
-    
+
     makeMove(destination) {
         super.makeMove(destination);
         if (this.isEnPassantSquare(destination)) {
@@ -486,7 +484,7 @@ class PawnMove extends Move {
             this.queenPawn();
         }
     }
-    
+
     undoMove(capturedPieceCode, checkers) {
         if (this.isEnPassantSquare(this.destination)) {
             this.undoCaptureEnPassant();
@@ -495,7 +493,7 @@ class PawnMove extends Move {
         }
         super.undoMove(capturedPieceCode, checkers);
     }
-    
+
     captureEnPassant() {
         var victimRank = this.finder.getRank(this.destination);
         if (toMove === 'w') {
@@ -505,27 +503,27 @@ class PawnMove extends Move {
         }
         document.getElementById(this.finder.getFile(this.destination) + "" + victimRank).innerHTML = "";
     }
-    
+
     undoCaptureEnPassant() {
         var victimRank = this.finder.getRank(this.destination);
         var pawnColour = '';
         if (toMove === 'w') {
             victimRank--;
             pawnColour = 'b';
-            
+
         } else {
             victimRank++;
             pawnColour = 'w';
         }
         document.getElementById(this.finder.getFile(this.destination) + "" + victimRank).innerHTML = pawnColour + 'pawn';
     }
-    
+
 }
 
 class SquareReader {
-    
+
     constructor() {
-        
+
     }
 
     exists(square) {
@@ -539,19 +537,19 @@ class SquareReader {
     isOccupied(square) {
         return square.innerHTML !== '';
     }
-    
+
     getFile(square) {
         return Number(square.id.substring(0, 1));
     }
-    
+
     getRank(square) {
         return Number(square.id.substring(1, 2));
     }
-    
+
 }
 
 class MoveRecorder extends SquareReader {
-    
+
     constructor(destinationSquare) {
         super();
         this.startSquare = move.start;
@@ -559,26 +557,26 @@ class MoveRecorder extends SquareReader {
         this.line = new LogbookHandler().getLogLine();
         this.piece = PieceReference.getOccupant(this.startSquare).piece;
         this.scoreboard = this.getScoreboard();
-        this.isCastle = 
+        this.isCastle =
                 this.piece === 'king' && Math.abs(this.getFile(this.startSquare) - this.getFile(this.destSquare)) === 2;
-        this.isCapture = 
+        this.isCapture =
                 this.isOccupied(this.destSquare) || (move instanceof PawnMove && move.isEnPassantSquare(this.destSquare));
     }
-    
+
     getScoreboard() {
         if (window.outerWidth <= window.outerHeight) {
             return document.getElementById('scoreboardTop');
         }
         return document.getElementById('scoreboardSide');
     }
-    
+
     getMoveSymbol() {
         if (this.isCapture) {
             return 'x';
         }
         return '-';
     }
-    
+
     recordMoveIntro() {
         if (toMove === 'b') { // toMove has already been changed here (-.-')
             this.line.innerHTML = turnCount() + '. ';
@@ -586,7 +584,7 @@ class MoveRecorder extends SquareReader {
             this.line.innerHTML += '  ';
         }
     }
-    
+
     recordMove() {
         this.recordMoveIntro();
         var moveDescription;
@@ -600,7 +598,7 @@ class MoveRecorder extends SquareReader {
         }
         this.line.innerHTML += moveDescription;
     }
-    
+
     getPawnMoveDescription() {
         var description;
         if (this.isCapture) {
@@ -610,31 +608,31 @@ class MoveRecorder extends SquareReader {
         } else {
             description = this.getCoordinates(this.destSquare); // Push notation
         }
-        
+
         var destRank = this.getRank(this.destSquare);
-        if (destRank === 8 || destRank === 1) { 
+        if (destRank === 8 || destRank === 1) {
             return description + "=Q"; // Queening notation
         }
         return description;
     }
-    
+
     getPieceMoveDescription() {
         var pieceCode = this.destSquare.innerHTML;
         return pieceCode + this.getCoordinates(this.startSquare) + this.getMoveSymbol() + this.getCoordinates(this.destSquare);
     }
-    
+
     getCastleDescription() {
         if (this.getFile(this.destSquare) === 3) {
             return  'O-O-O';
         }
         return 'O-O';
     }
-    
+
     recordCheck() {
         this.recordMove();
         this.line.innerHTML += '+';
     }
-    
+
     recordMate() {
         this.recordMove();
         this.line.innerHTML += '#';
@@ -645,7 +643,7 @@ class MoveRecorder extends SquareReader {
             score = '0 - 1';
         }
     }
-    
+
     displayResult(reason) {
         var scoreboardHTML = this.scoreboard.innerHTML;
         var whitePoints = Number(document.getElementById('whitePoints').innerText);
@@ -661,7 +659,7 @@ class MoveRecorder extends SquareReader {
             blackPoints += 0.5;
         }
         this.scoreboard.innerText = reason;
-        window.setTimeout( 
+        window.setTimeout(
             function(scoreboard, scoreboardHTML, whitePoints, blackPoints) {
                 scoreboard.innerHTML = scoreboardHTML;
                 document.getElementById('whitePoints').innerText = whitePoints;
@@ -669,22 +667,22 @@ class MoveRecorder extends SquareReader {
             },
         2000, this.scoreboard, scoreboardHTML, whitePoints, blackPoints);
     }
-    
+
     getCoordinates(square) {
         var file = '&#' + (this.getFile(square) + 96) + ';';
         return file + this.getRank(square);
     }
-    
+
 }
 
 class LogbookHandler {
-    
+
     constructor() {
         this.maxPageLength = 10;
         this.maxPages = this.getMaxPages();
         this.pages = this.getPages();
     }
-    
+
     getPages() {
         return document.getElementsByClassName('logPage');
     }
@@ -741,7 +739,7 @@ class LogbookHandler {
         }
         this.pages = this.getPages();
     }
-    
+
     addLogBook(isNew) {
         var newLogBook = document.createElement('tr');
         newLogBook.classList.add('logBook');
@@ -756,7 +754,7 @@ class LogbookHandler {
         }
         return newLogBook;
     }
-    
+
     getLogPage() {
         var i = 0;
         while (i < this.pages.length) {
@@ -773,7 +771,7 @@ class LogbookHandler {
         this.addLogBook(true);
         return this.getLogPage();
     }
-    
+
     getLogLine() {
         var page = this.getLogPage();
         var lines = page.children;
@@ -791,7 +789,7 @@ class LogbookHandler {
 }
 
 class Finder extends SquareReader {
-    
+
     constructor(square, move) {
         super();
         this.start = square;
@@ -818,8 +816,8 @@ class Finder extends SquareReader {
             return document.getElementById(nextFile + "" + nextRank);
         };
     }
-    
-    getDirection(start, destination) {        
+
+    getDirection(start, destination) {
         var vertical = "";
         if (this.getRank(start) < this.getRank(destination)) {
             vertical = "N";
@@ -848,7 +846,7 @@ class Finder extends SquareReader {
         }
         return opposite;
     }
-    
+
     getLegalDirections() {
         var pinFinder = new PinFinder(this.start);
         var movementDirections = PieceReference.getMovement(this.start).directions;
@@ -868,11 +866,11 @@ class Finder extends SquareReader {
         }
         return movementDirections;
     }
-    
+
 }
 
 class PawnMoveFinder extends Finder {
-    
+
     constructor(square, move) {
         super(square, move);
     }
@@ -890,7 +888,7 @@ class PawnMoveFinder extends Finder {
         }
         return destinations;
     }
-    
+
     getLegalDirections() {
         if (toMove === 'w') {
             return super.getLegalDirections('wPawn');
@@ -898,7 +896,7 @@ class PawnMoveFinder extends Finder {
             return super.getLegalDirections('bPawn');
         };
     }
-    
+
     getPushableSquares(direction) {
         var squareStepper = this.getSquareStepper(direction);
         var getPushableSquare = function(square, squareStepper, finder) {
@@ -914,7 +912,7 @@ class PawnMoveFinder extends Finder {
         }
         return pushSquares;
     }
-    
+
     canDoublePush() {
         if (toMove === 'w') {
             return this.getRank(this.start) === 2;
@@ -922,7 +920,7 @@ class PawnMoveFinder extends Finder {
             return this.getRank(this.start) === 7;
         }
     }
-    
+
     getCaptureSquare(direction) {
         var squareStepper = this.getSquareStepper(direction);
         var captureSquare = squareStepper(this.getFile(this.start), this.getRank(this.start));
@@ -933,7 +931,7 @@ class PawnMoveFinder extends Finder {
         }
         return [];
     }
-        
+
     isDoublePush(destination) {
         if (toMove === 'w') {
             return this.getRank(this.start) === 2 && this.getRank(destination) === 4;
@@ -941,15 +939,15 @@ class PawnMoveFinder extends Finder {
             return this.getRank(this.start) === 7 && this.getRank(destination) === 5;
         }
     }
-    
+
 }
 
 class PieceMoveFinder extends Finder {
-    
+
     constructor(square, move) {
         super(square, move);
     }
-    
+
     getLegalDestinations() {
         var movement = PieceReference.getMovement(this.start);
         var legalDirections = super.getLegalDirections();
@@ -974,11 +972,11 @@ class PieceMoveFinder extends Finder {
         }
         return destinations;
     }
-        
+
 }
 
 class KingMoveFinder extends PieceMoveFinder {
-    
+
     constructor(kingSquare, move) {
         super(kingSquare, move);
         this.attackFinder = new AttackFinder();
@@ -986,11 +984,11 @@ class KingMoveFinder extends PieceMoveFinder {
             this.start = this.attackFinder.getKingSquare();
         }
     }
-    
+
     getKing() {
         return this.start;
     }
-    
+
     getLegalDestinations() {
         var legalDestinations = super.getLegalDestinations();
         var kingHTML = this.start.innerHTML;
@@ -1000,7 +998,7 @@ class KingMoveFinder extends PieceMoveFinder {
         this.addCastleSquares(legalDestinations);
         return legalDestinations;
     }
-    
+
     addCastleSquares(destinations) {
         var sideStep;
         var sideSteppers = {
@@ -1024,21 +1022,21 @@ class KingMoveFinder extends PieceMoveFinder {
             }
         }
     }
-    
+
     isChecked() {
         return this.attackFinder.isAttacked(this.start);
     }
-    
+
     getCheckers() {
         return this.attackFinder.getAttackers(this.start);
     }
-    
+
     isMated() {
         // Assume is attacked.
         var checker = move.getCheckers();
         return !((checker.length === 1 && this.isCapturable(checker[0])) || this.hasEscapeSquare() || this.hasPotentialShield());
     }
-    
+
     isCapturable(enemy) {
         var attackers = this.enemyIsAttacked(enemy);
         while (attackers.length > 0) {
@@ -1052,7 +1050,7 @@ class KingMoveFinder extends PieceMoveFinder {
         }
         return false;
     }
-    
+
     enemyIsAttacked(enemy) {
         var tempToMove = toMove;
         toMove = PieceReference.getOccupant(enemy).colour;
@@ -1060,7 +1058,7 @@ class KingMoveFinder extends PieceMoveFinder {
         toMove = tempToMove;
         return attackers;
     }
-    
+
     hasEscapeSquare() {
         var kingDirections = PieceReference.getMovement('king').directions;
         while (kingDirections.length > 0) {
@@ -1078,7 +1076,7 @@ class KingMoveFinder extends PieceMoveFinder {
         }
         return false;
     }
-    
+
     hasPotentialShield() {
         var checkers = move.getCheckers();
         if (checkers.length < 2) {
@@ -1094,7 +1092,7 @@ class KingMoveFinder extends PieceMoveFinder {
         }
         return false;
     }
-    
+
     getBlockSquares(checker) {
         var blockSquares = [];
         var squareStepper = this.getSquareStepper(this.getDirection(checker, this.start));
@@ -1105,7 +1103,7 @@ class KingMoveFinder extends PieceMoveFinder {
         }
         return blockSquares;
     }
-    
+
     isShieldable (square) {
         var movementTypes = {
             walk:{type:'walk', directions:['N', 'E', 'S', 'W', 'NE', 'SE', 'SW', 'NW']},
@@ -1148,15 +1146,15 @@ class KingMoveFinder extends PieceMoveFinder {
         }
         return false;
     }
-    
+
 }
 
 class PieceFinder extends Finder {
-    
+
     constructor(square) {
         super(square);
     }
-    
+
     findPiece(start, squareStepper, type) {
         var nextSquare = start;
         do {
@@ -1167,7 +1165,7 @@ class PieceFinder extends Finder {
         } while (type === 'walk')
         return nextSquare;
     }
-    
+
     getKingSquare() {
         var i = 0;
         while (true) {
@@ -1178,19 +1176,19 @@ class PieceFinder extends Finder {
             i++;
         }
     }
-    
+
 }
 
 class PinFinder extends PieceFinder {
-    
+
     constructor(square) {
         super(square);
     }
-    
+
     getPinnableDirections() {
         return PieceReference.getMovement('queen').directions;
     }
-    
+
     getPinLines() {
         var pinLines = this.getPinnableDirections();
         for (var i = 0; i < pinLines.length; i++) {
@@ -1203,7 +1201,7 @@ class PinFinder extends PieceFinder {
         }
         return pinLines;
     }
-    
+
     isPinned() {
         var pinnableDirections = this.getPinnableDirections();
         while (pinnableDirections.length > 0) {
@@ -1214,14 +1212,14 @@ class PinFinder extends PieceFinder {
         }
         return false;
     }
-    
+
     isPinnedSpecific(piece, direction) {
         var squareStepper = this.getSquareStepper(direction);           // Search for opposing pieces that can walk along the given direction to this.start.
         var potentialPinner = PieceReference.getOccupant(this.findPiece(piece, squareStepper, 'walk'));
         var attackDirection = this.getOppositeDirection(direction);
         if (
-            this.exists(potentialPinner) && 
-            potentialPinner.colour !== toMove && 
+            this.exists(potentialPinner) &&
+            potentialPinner.colour !== toMove &&
             this.canWalk(potentialPinner.piece, attackDirection) &&     // If one is found, return true if this.start is the only piece between its king and the found piece.
             this.isKingShield(piece, attackDirection)
         ) {
@@ -1229,7 +1227,7 @@ class PinFinder extends PieceFinder {
         }
         return false;
     }
-    
+
     isKingShield(piece, direction) {
         var shieldHolder = this.findPiece(piece, this.getSquareStepper(direction), 'walk');
         if (this.exists(shieldHolder)) {
@@ -1240,7 +1238,7 @@ class PinFinder extends PieceFinder {
         }
         return false;
     }
-    
+
     canWalk(enemyPiece, direction) {
         var movement = PieceReference.getMovement(enemyPiece);
         if (movement.type === 'walk') {
@@ -1249,15 +1247,15 @@ class PinFinder extends PieceFinder {
         }
         return false;
     }
-    
+
 }
 
 class AttackFinder extends PieceFinder {
-    
+
     constructor() {
         super(undefined);
     }
-    
+
     removeAttackedSquares(squareList) {
         for (var i = 0; i < squareList.length; i++) {
             if (this.isAttacked(squareList[i])) {
@@ -1265,11 +1263,11 @@ class AttackFinder extends PieceFinder {
             }
         }
     }
-    
+
     isAttacked(square) {
         return this.getAttackers(square).length > 0;
     }
-    
+
     getAttackers (square) {
         var movementTypes = {
             walk:{type:'walk', directions:['N', 'E', 'S', 'W', 'NE', 'SE', 'SW', 'NW']},
@@ -1291,18 +1289,18 @@ class AttackFinder extends PieceFinder {
                         }
                         if (movement.type === attackerMovement.type) {
                             attackers.push(attackerSquare);
-                        } 
+                        }
                     }
                 }
             }
         }
         return attackers;
     }
-    
+
 }
 
 class AestheticsManager {
-    
+
     static prepAnimation(square) {
         square.classList.remove('rejected');
         square.classList.remove('accepted');
@@ -1316,7 +1314,7 @@ class AestheticsManager {
             className = 'rejected';
         }
         square.classList.remove(className);
-        window.setTimeout( 
+        window.setTimeout(
             function(square, className) {
                 square.classList.add(className);
             },
@@ -1329,7 +1327,7 @@ class AestheticsManager {
             rejectedSquares[0].classList.remove('rejected');
         }
     }
-    
+
     static flushAccepted(square) {
         square.classList.remove('accepted');
         void square.offsetWidth;
@@ -1393,12 +1391,12 @@ class PieceReference {
                 return PieceReference.getMovement(PieceReference.getOccupant(piece).piece);
         };
     }
-    
+
     static holdsPawn(square) {
         var pieceCode = square.innerHTML;
         return pieceCode === '\u2659' || pieceCode === '\u265F';
     }
-    
+
 }
 
 var moveCount;
@@ -1419,4 +1417,3 @@ window.addEventListener('resize', function() {
     redrawPage();
     new LogbookHandler().redrawLogbooks();
 });
-
